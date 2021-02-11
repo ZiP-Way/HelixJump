@@ -14,6 +14,8 @@ public class Ball : MonoBehaviour
     private bool isIgnoreNextCollision;
     private int scoreValue;
 
+    private int amountDestroyedPlatforms;
+
     private void Awake()
     {
         rigidbody = GetComponent<Rigidbody>();
@@ -26,7 +28,9 @@ public class Ball : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        scoreValue += 5;
+        amountDestroyedPlatforms++;
+
+        scoreValue += scoreSystem.Wave;
         scoreSystem.UpdateScore(scoreValue);
 
         Destroy(other.gameObject);
@@ -34,20 +38,32 @@ public class Ball : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        scoreValue = 0;
-        if (collision.gameObject.CompareTag("DangerousPart") 
-            || collision.gameObject.transform.parent.CompareTag("LastPlatform"))
-        {
-            gameController.EnableRestartPanel();
-        }
-
         if (isIgnoreNextCollision) return;
-
         isIgnoreNextCollision = true;
         StartCoroutine(AllowCollision());
 
+        if (collision.gameObject.transform.parent.CompareTag("LastPlatform"))
+        {
+            gameController.EnableRestartPanel(true); // set pause and move to next wave
+        }
+
+        if (amountDestroyedPlatforms < 3)
+        {
+            if (collision.gameObject.CompareTag("DangerousPart"))
+            {
+                gameController.EnableRestartPanel(false); // set pause
+            }
+        }
+        else if(!collision.gameObject.transform.parent.CompareTag("LastPlatform"))
+        {
+            Destroy(collision.gameObject.transform.parent);
+        }
+
         rigidbody.velocity = Vector3.zero;
         rigidbody.AddForce(Vector3.up * impulseForce, ForceMode.Impulse);
+
+        scoreValue = 0;
+        amountDestroyedPlatforms = 0;
     }
 
     private IEnumerator AllowCollision()

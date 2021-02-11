@@ -4,7 +4,6 @@ using UnityEngine.SceneManagement;
 public class GameController : MonoBehaviour
 {
     [SerializeField] private GameObject restartMenu;
-
     private ScoreSystem scoreSystem;
 
     private void Awake()
@@ -20,8 +19,13 @@ public class GameController : MonoBehaviour
         SceneManager.LoadScene("SampleScene");
     }
 
-    public void EnableRestartPanel()
+    public void EnableRestartPanel(bool isSetNextWave)
     {
+        if (isSetNextWave)
+        { // If the wave was completed, set the next wave
+            scoreSystem.UpdateWave();
+        }
+
         restartMenu.SetActive(true);
         scoreSystem.UpdateBestScore();
 

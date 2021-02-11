@@ -30,7 +30,12 @@ public class Platform : MonoBehaviour
     {
         rndIndexOfPart = Random.Range(minValue, transform.childCount);
 
-        transform.GetChild(rndIndexOfPart).gameObject.SetActive(false); // disable one random part of the platform
+        transform.GetChild(rndIndexOfPart).gameObject.SetActive(false); // disable random part of the platform
+
+        if (rndIndexOfPart > 1 && rndIndexOfPart < transform.childCount)
+            transform.GetChild(rndIndexOfPart - 1).gameObject.SetActive(false);
+        else if (rndIndexOfPart == 1 || rndIndexOfPart == 0)
+            transform.GetChild(rndIndexOfPart + 1).gameObject.SetActive(false);
     }
 
     private void SetDangerousPart()
